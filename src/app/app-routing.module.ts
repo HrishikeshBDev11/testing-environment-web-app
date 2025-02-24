@@ -1,22 +1,13 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { LoginComponent } from './@core/components/login/login.component';
-import { DashboardComponent } from './@core/components/dashboard/dashboard.component';
-import { MeetingsComponent } from './@core/components/meetings/meetings.component';
+import { authGuard } from './@core/auth/auth.guard';
 
 const routes: Routes = [
-  {
-    path: '', redirectTo: 'login', pathMatch: 'full'
-  },
-  {
-    path: 'login', component:LoginComponent,
-  },
-  {
-    path: 'dashboard', component:DashboardComponent,
-  },
-  {
-    path: 'meeting', component:MeetingsComponent,
-  }
+  { path: '', redirectTo: 'auth', pathMatch: 'full' },
+  { path: 'auth', loadChildren: () => import('./@core/components/auth/auth-component.module').then(auth => auth.AuthComponentModule) },
+  { path: 'feature', canActivate: [authGuard], loadChildren: () => import('./@core/components/feature/feature.module').then(feature => feature.FeatureModule) },
+  { path: 'personal-details', canActivate: [authGuard], loadComponent: () => import('./@core/components/feature/personal-details/personal-details.component').then(personalDetails => personalDetails.PersonalDetailsComponent) },
+  { path: 'settings', canActivate: [authGuard], loadChildren: () => import('./@core/components/settings/settings.module').then(setting => setting.SettingsModule) },
 ];
 
 @NgModule({

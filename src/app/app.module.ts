@@ -1,32 +1,60 @@
-import { NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { APP_INITIALIZER, ApplicationRef, NgModule } from '@angular/core';
+import { BrowserModule, platformBrowser } from '@angular/platform-browser';
 
-import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
-import { CommonModule, HashLocationStrategy, LocationStrategy } from '@angular/common';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { LoginModule } from './@core/components/login/login.module';
-import { DashboardModule } from './@core/components/dashboard/dashboard.module';
-import { MeetingsModule } from './@core/components/meetings/meetings.module';
+import { AppComponent } from './app.component';
+import { PrimeNgModule } from './shared/modules/prime-ng.module';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { HttpClientModule } from '@angular/common/http';
+import { HeaderComponent } from './shared/layouts/header/header.component';
+import { SidebarComponent } from './shared/layouts/sidebar/sidebar.component';
+import { DatePipe, HashLocationStrategy, LocationStrategy } from '@angular/common';
+import { environment } from 'src/environments/environment';
+import { DevResIdentifyDirective } from './shared/others/dev-res-identify.directive';
+import { ConfirmationService } from 'primeng/api';
+
+export function loadConfig() {
+  // return console.log('App Started.');
+  environment.screenHeight = window.innerHeight;
+  environment.screenWidth = window.innerWidth;
+  environment.currentUsingPlatform = window.navigator.platform;
+}
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    HeaderComponent,
+    SidebarComponent,
   ],
   imports: [
-    CommonModule,
     BrowserModule,
     BrowserAnimationsModule,
     AppRoutingModule,
-    FormsModule,
-    ReactiveFormsModule,
-    DashboardModule,
-    MeetingsModule
+    PrimeNgModule,
+    HttpClientModule,
+    DevResIdentifyDirective,
   ],
-  providers: [
-    { provide: LocationStrategy, useClass: HashLocationStrategy },
+  exports: [
+    PrimeNgModule
   ],
-  bootstrap: [AppComponent]
+  providers: [PrimeNgModule, DatePipe, ConfirmationService, { provide: LocationStrategy, useClass: HashLocationStrategy },
+    {
+      provide: APP_INITIALIZER,
+      useFactory: loadConfig,
+      // multi: true
+    }
+  ],
+  // bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule {
+
+  constructor(private appRef: ApplicationRef) { }
+
+  ngDoBootstrap() {
+    // Manually bootstrap the app component
+    this.appRef.bootstrap(AppComponent);
+  }
+
+}
+
+
